@@ -26,12 +26,7 @@ parport_opendev(dev)
 		if(fd < 0) {
 			RETVAL = -1;
 		} else {
-			if(ioctl(fd, PPCLAIM, 0) != 0) {
-				close(fd);
-				RETVAL = -1;
-			} else {
-				RETVAL = fd;
-			}
+			RETVAL = fd;
 		}
 	OUTPUT:
 		RETVAL
@@ -48,7 +43,9 @@ parport_rd_data(base)
 	CODE:
 		int d;
 		unsigned char byte;
+		ioctl(base, PPCLAIM, 0);
 		ioctl(base, PPRDATA, &byte);
+		ioctl(base, PPRELEASE, 0);
 		RETVAL = byte;
 	OUTPUT:
 		RETVAL
@@ -60,14 +57,18 @@ parport_wr_data(base, val)
 	CODE:
 		unsigned char byte;
 		byte = val & 0xff;
+		ioctl(base, PPCLAIM, 0);
 		ioctl(base, PPWDATA, &byte);
+		ioctl(base, PPRELEASE, 0);
 
 char
 parport_rd_ctrl(base)
 	int base
 	CODE:
 		unsigned char byte;
+		ioctl(base, PPCLAIM, 0);
 		ioctl(base, PPRCONTROL, &byte);
+		ioctl(base, PPRELEASE, 0);
 		RETVAL = byte;
 	OUTPUT:
 		RETVAL
@@ -79,14 +80,18 @@ parport_wr_ctrl(base, val)
 	CODE:
 		unsigned char byte;
 		byte = val & 0xff;
+		ioctl(base, PPCLAIM, 0);
 		ioctl(base, PPWCONTROL, &byte);
+		ioctl(base, PPRELEASE, 0);
 
 char
 parport_rd_status(base)
 	int base
 	CODE:
 		unsigned char byte;
+		ioctl(base, PPCLAIM, 0);
 		ioctl(base, PPRSTATUS, &byte);
+		ioctl(base, PPRELEASE, 0);
 		RETVAL = byte;
 	OUTPUT:
 		RETVAL
